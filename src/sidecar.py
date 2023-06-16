@@ -11,6 +11,7 @@ from requests.packages.urllib3.util.retry import Retry
 from helpers import REQ_RETRY_TOTAL, REQ_RETRY_CONNECT, REQ_RETRY_READ, REQ_RETRY_BACKOFF_FACTOR
 from logger import get_logger
 from resources import list_resources, watch_for_changes
+from src import k8s
 
 METHOD = "METHOD"
 UNIQUE_FILENAMES = "UNIQUE_FILENAMES"
@@ -27,6 +28,7 @@ REQ_IGNORE_INITIAL_EVENT = "REQ_IGNORE_INITIAL_EVENT"
 SCRIPT = "SCRIPT"
 ENABLE_5XX = "ENABLE_5XX"
 IGNORE_ALREADY_PROCESSED = "IGNORE_ALREADY_PROCESSED"
+SA_CREDENTIALS_PATH_PREFIX = "BOTKUBE_SETTINGS_SA__CREDENTIALS__PATH__PREFIX"
 
 # Get logger
 logger = get_logger()
@@ -138,7 +140,7 @@ def _initialize_kubeclient_configuration():
         config.load_kube_config(kube_config)
     else:
         logger.info("Loading incluster config ...")
-        config.load_incluster_config()
+        k8s.load_incluster_config(None, True, os.getenv(SA_CREDENTIALS_PATH_PREFIX))
 
     if os.getenv(SKIP_TLS_VERIFY) == "true":
         configuration = client.Configuration.get_default_copy()
